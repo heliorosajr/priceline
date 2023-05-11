@@ -1,0 +1,23 @@
+### Maven ###
+target/
+logs
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### VS Code ###
+.vscode/
+
+### MacOS ###
+.DS_Store
+
+### Eclipse ###
+*.settings
+*.project
+HELP.md
+mvnw
+mvnw.cmd
+*.classpath
