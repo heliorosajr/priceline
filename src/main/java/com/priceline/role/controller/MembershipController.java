@@ -95,7 +95,7 @@ public class MembershipController {
     }
 
     @PostMapping
-    @Operation(summary = "Add membership", tags = "membership")
+    @Operation(summary = "Add membership")
     @ApiResponse(responseCode = "201", description = "Created", content = {
             @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Membership.class)))})
     @ApiErrorResponses
@@ -109,7 +109,7 @@ public class MembershipController {
     }
     
     @DeleteMapping("/{uid}")
-    @Operation(summary = "Delete membership", tags = "membership")
+    @Operation(summary = "Delete membership")
     @ApiResponse(responseCode = "204", description = "Deleted")
     @ApiErrorResponses
     @ResponseStatus(code = HttpStatus.NO_CONTENT)

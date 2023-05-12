@@ -67,7 +67,7 @@ public class RoleController {
     }
     
     @PostMapping
-    @Operation(summary = "Add role", tags = "role")
+    @Operation(summary = "Add role")
     @ApiResponse(responseCode = "201", description = "Created", content = {
             @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Role.class)))})
     @ApiErrorResponses
@@ -81,7 +81,7 @@ public class RoleController {
     }
     
     @PutMapping("/{uid}")
-    @Operation(summary = "Update role", tags = "role")
+    @Operation(summary = "Update role")
     @ApiResponse(responseCode = "200", description = "Updated", content = {
             @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Role.class)))})
     @ApiErrorResponses
@@ -95,7 +95,7 @@ public class RoleController {
     }
     
     @PutMapping("/set-default/{uid}")
-    @Operation(summary = "Set role as default", tags = "role")
+    @Operation(summary = "Set role as default")
     @ApiResponse(responseCode = "200", description = "Updated", content = {
             @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Role.class)))})
     @ApiErrorResponses
@@ -109,7 +109,7 @@ public class RoleController {
     }
     
     @DeleteMapping("/{uid}")
-    @Operation(summary = "Delete role", tags = "role")
+    @Operation(summary = "Delete role")
     @ApiResponse(responseCode = "204", description = "Deleted")
     @ApiErrorResponses
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
