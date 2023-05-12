@@ -13,6 +13,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +30,12 @@ public class RoleRepositoryTest {
     @Autowired
     private RoleRepository roleRepository;
     
-    private Random random = new Random();
+    private static Random random = new Random();
+    
+    @BeforeAll
+    public static void init() {
+    	random = new Random();
+    }
     
     @AfterEach
     public void destroyAll(){
@@ -128,6 +134,7 @@ public class RoleRepositoryTest {
     	assertNull(actual);
     }
     
+    // Utilities
     private Role createRole() {
     	return createRole(true);
     }
