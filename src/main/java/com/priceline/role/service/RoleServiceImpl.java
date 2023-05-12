@@ -67,7 +67,12 @@ public class RoleServiceImpl implements RoleService {
     	Role role = dto.toRole();
     	role.setUid(UUID.randomUUID().toString());
     	
-    	if(dto.isDefaultRole()) {
+    	long roles = roleRepository.count();
+    	if(roles == 0) {
+    		dto.setDefaultRole(true);
+    	}
+    	
+    	if(dto.isDefaultRole() && roles > 0) {
     		updateDefaultRole();
     	}
     	
