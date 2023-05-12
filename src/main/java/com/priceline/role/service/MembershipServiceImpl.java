@@ -111,7 +111,7 @@ public class MembershipServiceImpl extends MembershipService {
     	    	
     	// team id is required
     	validationService.validateRequired(dto.getTeamId(), "teamId");
-    	validationService.validateStringMaxLength(dto.getUserId(), "teamId", 40);
+    	validationService.validateStringMaxLength(dto.getTeamId(), "teamId", 40);
     	
     	// validate user and team
     	UserDTO userDTO = pricelineFacade.findUserById(dto.getUserId());
