@@ -94,6 +94,20 @@ public class RoleController {
           .body(entityModel);
     }
     
+    @PutMapping("/set-default/{uid}")
+    @Operation(summary = "Set role as default", tags = "role")
+    @ApiResponse(responseCode = "200", description = "Updated", content = {
+            @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Role.class)))})
+    @ApiErrorResponses
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseEntity<?> updateDefaultRole(@PathVariable String uid) throws PricelineApiException {
+      EntityModel<Role> entityModel = assembler.toModel(roleService.updateDefaultRole(uid));
+
+      return ResponseEntity
+          .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+          .body(entityModel);
+    }
+    
     @DeleteMapping("/{uid}")
     @Operation(summary = "Delete role", tags = "role")
     @ApiResponse(responseCode = "204", description = "Deleted")

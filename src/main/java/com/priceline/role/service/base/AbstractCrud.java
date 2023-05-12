@@ -1,4 +1,4 @@
-package com.priceline.role.service;
+package com.priceline.role.service.base;
 
 import java.util.List;
 

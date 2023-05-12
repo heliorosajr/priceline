@@ -13,7 +13,10 @@ import lombok.EqualsAndHashCode;
 @Entity(name = DatabaseConstants.TABLE_ROLE)
 public class Role extends BaseEntity {
 
-    @Column(length = 150,  unique = true, nullable = false)
+    @Column(length = 150, unique = true, nullable = false)
     private String name;
+    
+    @Column(name = "default_role")
+    private boolean defaultRole;
 
 }

@@ -47,6 +47,14 @@ public class RoleServiceImpl implements RoleService {
         }
     }
 
+    public Role findDefaultRole() throws PricelineApiException {
+        try {
+            return Optional.ofNullable(roleRepository.findByDefaultRoleTrue()).orElseThrow(() -> new EntityNotFoundException("default"));
+        } catch (Exception exception) {
+            throw exceptionService.throwRuntimeException(exception, MessageEnum.ROLE_ERROR_FIND_DEFAULT_HELP);
+        }
+    }
+    
     // ----------------------------------------------------
     // Persist
     // ----------------------------------------------------
@@ -73,6 +81,25 @@ public class RoleServiceImpl implements RoleService {
         return roleRepository.save(role);
     }
 
+    public Role updateDefaultRole(String uid) throws PricelineApiException {
+    	// load current default role
+    	Role defaultRole = findDefaultRole();
+    	
+    	if(defaultRole.getUid().equals(uid)) {
+    		return defaultRole;
+    	}
+    	
+    	// load role to ensure it exists
+    	Role role = findByUid(uid);
+    	
+    	// update statuses
+    	defaultRole.setDefaultRole(false);
+    	role.setDefaultRole(true);
+    	roleRepository.saveAll(List.of(defaultRole, role));
+    	
+    	return role;
+    }
+    
     // ----------------------------------------------------
     // Delete
     // ----------------------------------------------------
