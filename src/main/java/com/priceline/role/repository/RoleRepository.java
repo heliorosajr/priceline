@@ -8,6 +8,8 @@ import com.priceline.role.model.Role;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
-    Role findByUid(String uid);
+	Role findByName(String name);
+    
+	Role findByUid(String uid);
 
 }

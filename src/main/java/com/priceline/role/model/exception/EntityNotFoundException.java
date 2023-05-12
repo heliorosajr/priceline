@@ -8,7 +8,9 @@ import lombok.Getter;
 
 public class EntityNotFoundException extends BaseException {
 
-    @Getter
+    private static final long serialVersionUID = 1L;
+
+	@Getter
     private final Object id;
 
     public EntityNotFoundException(Object id) {

@@ -16,19 +16,21 @@ public class ExceptionService {
 
     @Autowired
     private MessageService messageService;
-
+    
     public PricelineApiException throwRuntimeException(Exception exception, MessageEnum messageEnum, Object... args) throws PricelineApiException {
     	PricelineApiException ex;
 
         if(exception instanceof BaseException) {
             ex = getPricelineApiException((BaseException) exception);
+        } else if(exception instanceof IllegalArgumentException) {
+        	ex = getPricelineApiException(messageEnum, args);
         } else if(exception instanceof PricelineApiException) {
             ex = (PricelineApiException) exception;
         } else {
             ex = getPricelineApiException(exception, messageEnum, args);
         }
 
-        log.error("Real State API Exception");
+        log.error("Priceline API Exception");
         log.error(ex.getMessage());
         log.error(ex.getHelp());
         log.error(ex.getStatus().getReasonPhrase());
@@ -49,6 +51,13 @@ public class ExceptionService {
         String help = messageService.getMessage(messageEnum, args);
 
         return new PricelineApiException(description, exception.getMessage(), help, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+    private PricelineApiException getPricelineApiException(MessageEnum messageEnum, Object[] args) {
+    	String description = messageService.getMessage(MessageEnum.VALIDATION_FAILURE_DESCRIPTION);
+        String help = messageService.getMessage(messageEnum, args);
+
+        return new PricelineApiException(description, help, null, HttpStatus.BAD_REQUEST);
     }
 
 

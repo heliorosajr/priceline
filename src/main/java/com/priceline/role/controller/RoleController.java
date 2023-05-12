@@ -3,16 +3,21 @@ package com.priceline.role.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.priceline.role.controller.restfull.annotation.ApiErrorResponses;
 import com.priceline.role.controller.restfull.assembler.RoleModelAssembler;
+import com.priceline.role.dto.RoleDTO;
 import com.priceline.role.model.Role;
 import com.priceline.role.model.exception.PricelineApiException;
 import com.priceline.role.service.RoleService;
@@ -57,6 +62,19 @@ public class RoleController {
         CollectionModel<EntityModel<Role>> collectionModel = assembler.toCollectionModel(roleService.findAll());
 
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+    }
+    
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Add role", tags = "role")
+    @ApiResponse(responseCode = "201", description = "Created")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    ResponseEntity<?> create(@RequestBody RoleDTO roleDTO) {
+
+      EntityModel<Role> entityModel = assembler.toModel(roleService.save(roleDTO));
+
+      return ResponseEntity
+          .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+          .body(entityModel);
     }
 
 }
