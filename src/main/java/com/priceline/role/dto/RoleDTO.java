@@ -15,9 +15,12 @@ public class RoleDTO extends AbstractDTO {
 
 	private String name;
 	
+	private boolean defaultRole;
+	
 	public Role toRole() {
 		Role role = new Role();
 		role.setName(this.name);
+		role.setDefaultRole(this.defaultRole);
 		
 		return role;
 	}

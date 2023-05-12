@@ -67,6 +67,10 @@ public class RoleServiceImpl implements RoleService {
     	Role role = dto.toRole();
     	role.setUid(UUID.randomUUID().toString());
     	
+    	if(dto.isDefaultRole()) {
+    		updateDefaultRole();
+    	}
+    	
     	return roleRepository.save(role);
     }
 
@@ -83,21 +87,29 @@ public class RoleServiceImpl implements RoleService {
 
     public Role updateDefaultRole(String uid) throws PricelineApiException {
     	// load current default role
-    	Role defaultRole = findDefaultRole();
+    	Role oldDefaultRole = findDefaultRole();
     	
-    	if(defaultRole.getUid().equals(uid)) {
-    		return defaultRole;
+    	if(oldDefaultRole.getUid().equals(uid)) {
+    		return oldDefaultRole;
     	}
     	
     	// load role to ensure it exists
-    	Role role = findByUid(uid);
+    	Role newDefaultRole = findByUid(uid);
     	
     	// update statuses
-    	defaultRole.setDefaultRole(false);
-    	role.setDefaultRole(true);
-    	roleRepository.saveAll(List.of(defaultRole, role));
+    	oldDefaultRole.setDefaultRole(false);
+    	newDefaultRole.setDefaultRole(true);
+    	roleRepository.saveAll(List.of(oldDefaultRole, newDefaultRole));
     	
-    	return role;
+    	return newDefaultRole;
+    }
+    
+    private void updateDefaultRole() throws PricelineApiException {
+    	// load current default role and update
+    	Role oldDefaultRole = findDefaultRole();
+    	oldDefaultRole.setDefaultRole(false);
+    	
+    	roleRepository.save(oldDefaultRole);
     }
     
     // ----------------------------------------------------
