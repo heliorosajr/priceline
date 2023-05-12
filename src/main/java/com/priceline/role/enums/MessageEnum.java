@@ -12,6 +12,7 @@ public enum MessageEnum {
 	// Role
 	ROLE_ERROR_FIND_BY_ID_HELP("role.error.findById.help"),
     ROLE_ERROR_FIND_ALL_HELP("role.error.findAll.help"),
+    ROLE_ERROR_DELETE_HELP("role.error.delete.help"),
 	
 	// Unknown
     UNKNOWN_ERROR_DESCRIPTION("unexpected.error.description"),

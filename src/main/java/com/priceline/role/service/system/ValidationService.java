@@ -1,12 +1,10 @@
 package com.priceline.role.service.system;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.priceline.role.enums.MessageEnum;
 import com.priceline.role.model.base.BaseEntity;
-import com.priceline.role.model.exception.PricelineApiException;
 
 @Service
 public class ValidationService {
@@ -16,7 +14,7 @@ public class ValidationService {
 	
 	public void validateStringMaxLength(String str, String field, int max) {
 		if(str != null && str.length() > max) {
-	        exceptionService.throwRuntimeException(new IllegalArgumentException(), MessageEnum.VALIDATION_FAILURE_STRING_MAX_LENGTH_ERR, field, max);
+	        exceptionService.throwIllegalArgumentException(MessageEnum.VALIDATION_FAILURE_STRING_MAX_LENGTH_ERR, field, max);
 		}
     }
 	
@@ -32,7 +30,7 @@ public class ValidationService {
         }
         
         if(throwException) {
-	        exceptionService.throwRuntimeException(new IllegalArgumentException(), MessageEnum.VALIDATION_FAILURE_REQUIRED_ERR, field);
+	        exceptionService.throwIllegalArgumentException(MessageEnum.VALIDATION_FAILURE_REQUIRED_ERR, field);
         }
     }
 	
@@ -42,7 +40,7 @@ public class ValidationService {
 		}
 		
 		if(uid == null || !baseEntity.getUid().equals(uid)) {
-			exceptionService.throwRuntimeException(new IllegalArgumentException(), MessageEnum.VALIDATION_FAILURE_UNIQUENESS_ERR);
+			exceptionService.throwIllegalArgumentException(MessageEnum.VALIDATION_FAILURE_UNIQUENESS_ERR);
         }
 	}
 

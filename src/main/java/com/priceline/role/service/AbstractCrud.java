@@ -23,7 +23,7 @@ public interface AbstractCrud<T, U> {
     // ----------------------------------------------------
     // Delete
     // ----------------------------------------------------
-    void delete(String id) throws PricelineApiException;
+    void delete(String uid) throws PricelineApiException;
 
     // ----------------------------------------------------
     // Validation

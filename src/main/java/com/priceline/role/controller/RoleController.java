@@ -7,9 +7,11 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -42,13 +44,13 @@ public class RoleController {
     private RoleModelAssembler assembler;
 
     @Operation(summary = "Get role by id")
-    @ApiResponse(responseCode = "200", description = "Country was found",
+    @ApiResponse(responseCode = "200", description = "Role was found",
             content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation =  Role.class)) })
     @ApiErrorResponses
-    @GetMapping("/{id}")
+    @GetMapping("/{uid}")
     public ResponseEntity<?> findByUid(
-            @Parameter(description = "The role id") @PathVariable String id) throws PricelineApiException {
-        EntityModel<Role> entityModel = assembler.toModel(roleService.findByUid(id));
+            @Parameter(description = "The role id") @PathVariable String uid) throws PricelineApiException {
+        EntityModel<Role> entityModel = assembler.toModel(roleService.findByUid(uid));
 
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);
     }
@@ -64,17 +66,44 @@ public class RoleController {
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
     }
     
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     @Operation(summary = "Add role", tags = "role")
-    @ApiResponse(responseCode = "201", description = "Created")
+    @ApiResponse(responseCode = "201", description = "Created", content = {
+            @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Role.class)))})
+    @ApiErrorResponses
     @ResponseStatus(code = HttpStatus.CREATED)
-    ResponseEntity<?> create(@RequestBody RoleDTO roleDTO) {
-
+    public ResponseEntity<?> create(@RequestBody RoleDTO roleDTO) {
       EntityModel<Role> entityModel = assembler.toModel(roleService.save(roleDTO));
 
       return ResponseEntity
           .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
           .body(entityModel);
+    }
+    
+    @PutMapping("/{uid}")
+    @Operation(summary = "Update role", tags = "role")
+    @ApiResponse(responseCode = "200", description = "Updated", content = {
+            @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Role.class)))})
+    @ApiErrorResponses
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseEntity<?> update(@RequestBody RoleDTO roleDTO, @PathVariable String uid) throws PricelineApiException {
+      EntityModel<Role> entityModel = assembler.toModel(roleService.update(roleDTO, uid));
+
+      return ResponseEntity
+          .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+          .body(entityModel);
+    }
+    
+    @DeleteMapping("/{uid}")
+    @Operation(summary = "Delete role", tags = "role")
+    @ApiResponse(responseCode = "204", description = "Deleted")
+    @ApiErrorResponses
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public ResponseEntity<?> delete(@PathVariable String uid) throws PricelineApiException {
+      roleService.delete(uid);
+
+      return ResponseEntity.noContent().build();
+
     }
 
 }

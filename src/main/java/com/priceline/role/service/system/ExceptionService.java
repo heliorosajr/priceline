@@ -17,6 +17,10 @@ public class ExceptionService {
     @Autowired
     private MessageService messageService;
     
+    public PricelineApiException throwIllegalArgumentException(MessageEnum messageEnum, Object... args) throws PricelineApiException {
+    	return throwRuntimeException(new IllegalArgumentException(), messageEnum, args);
+    }
+    
     public PricelineApiException throwRuntimeException(Exception exception, MessageEnum messageEnum, Object... args) throws PricelineApiException {
     	PricelineApiException ex;
 
@@ -59,6 +63,5 @@ public class ExceptionService {
 
         return new PricelineApiException(description, help, null, HttpStatus.BAD_REQUEST);
     }
-
 
 }

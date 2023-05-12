@@ -1,5 +1,8 @@
 package com.priceline.role.controller.restfull.assembler;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,9 +15,6 @@ import com.priceline.role.controller.RoleController;
 import com.priceline.role.model.Role;
 
 import lombok.SneakyThrows;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 public class RoleModelAssembler implements RepresentationModelAssembler<Role, EntityModel<Role>> {

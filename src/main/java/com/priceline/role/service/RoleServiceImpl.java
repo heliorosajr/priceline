@@ -67,15 +67,21 @@ public class RoleServiceImpl implements RoleService {
     	dto.setUid(uid);
     	validate(dto);
     	
-    	// TODO
-        return null;
+    	Role role = findByUid(uid);
+    	role.setName(dto.getName());
+
+        return roleRepository.save(role);
     }
 
     // ----------------------------------------------------
     // Delete
     // ----------------------------------------------------
-    public void delete(String id) throws PricelineApiException {
-    	// TODO
+    public void delete(String uid) throws PricelineApiException {
+    	 try {
+	        roleRepository.deleteByUid(uid);
+	    } catch (Exception exception) {
+	    	throw exceptionService.throwRuntimeException(exception, MessageEnum.ROLE_ERROR_DELETE_HELP, uid);
+	    }
     }
 
     // ----------------------------------------------------
@@ -91,6 +97,7 @@ public class RoleServiceImpl implements RoleService {
     	// ensure name is unique
     	Role role = roleRepository.findByName(dto.getName());
     	validationService.validateUniqueness(dto.getUid(), role);
+
     }
 
 }
