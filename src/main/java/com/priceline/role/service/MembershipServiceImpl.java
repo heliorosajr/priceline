@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.priceline.role.dto.MembershipDTO;
+import com.priceline.role.dto.TeamDTO;
+import com.priceline.role.dto.UserDTO;
 import com.priceline.role.enums.MessageEnum;
+import com.priceline.role.facade.PricelineFacade;
 import com.priceline.role.model.Membership;
 import com.priceline.role.model.Role;
 import com.priceline.role.model.exception.EntityNotFoundException;
@@ -25,6 +28,9 @@ public class MembershipServiceImpl extends MembershipService {
 	
     @Autowired
     private ExceptionService exceptionService;
+    
+    @Autowired
+    private PricelineFacade pricelineFacade;
     
     @Autowired
     private RoleService roleService;
@@ -102,12 +108,21 @@ public class MembershipServiceImpl extends MembershipService {
     	// user id is required
     	validationService.validateRequired(dto.getUserId(), "userId");
     	validationService.validateStringMaxLength(dto.getUserId(), "userId", 40);
-    	// TODO validate user with API
-    	
+    	    	
     	// team id is required
     	validationService.validateRequired(dto.getTeamId(), "teamId");
     	validationService.validateStringMaxLength(dto.getUserId(), "teamId", 40);
-    	// TODO validate team with API
+    	
+    	// validate user and team
+    	UserDTO userDTO = pricelineFacade.findUserById(dto.getUserId());
+    	if(userDTO == null) {
+    		// TODO
+    	}
+    	
+    	TeamDTO teamDTO = pricelineFacade.findTeamById(dto.getTeamId());
+		if(teamDTO == null) {
+    		// TODO
+    	}
     	
     	// load role
     	Role role;

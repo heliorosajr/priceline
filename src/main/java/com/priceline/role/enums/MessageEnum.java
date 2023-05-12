@@ -21,9 +21,15 @@ public enum MessageEnum {
 	ROLE_ERROR_FIND_BY_ID_HELP("role.error.findById.help"),
 	ROLE_ERROR_FIND_DEFAULT_HELP("role.error.findDefault.help"),
     ROLE_ERROR_DELETE_HELP("role.error.delete.help"),
-	
+    
+    // Team API
+    TEAM_API_ERROR_FIND_BY_ID_HELP("team.api.error.findById.help"),
+    
 	// Unknown
     UNKNOWN_ERROR_DESCRIPTION("unexpected.error.description"),
+    
+    // User API
+    USER_API_ERROR_FIND_BY_ID_HELP("user.api.error.findById.help"),
 
 	// Validation failure
     VALIDATION_FAILURE_DESCRIPTION("validation.failure.description"),
