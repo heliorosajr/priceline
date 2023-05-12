@@ -116,12 +116,12 @@ public class MembershipServiceImpl extends MembershipService {
     	// validate user and team
     	UserDTO userDTO = pricelineFacade.findUserById(dto.getUserId());
     	if(userDTO == null) {
-    		// TODO
+    		exceptionService.throwIllegalArgumentException(MessageEnum.USER_API_USER_NOT_FOUND_HELP, dto.getUserId());
     	}
     	
     	TeamDTO teamDTO = pricelineFacade.findTeamById(dto.getTeamId());
 		if(teamDTO == null) {
-    		// TODO
+			exceptionService.throwIllegalArgumentException(MessageEnum.TEAM_API_TEAM_NOT_FOUND_HELP, dto.getTeamId());
     	}
     	
     	// load role

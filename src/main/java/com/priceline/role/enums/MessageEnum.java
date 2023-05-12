@@ -24,12 +24,14 @@ public enum MessageEnum {
     
     // Team API
     TEAM_API_ERROR_FIND_BY_ID_HELP("team.api.error.findById.help"),
+    TEAM_API_TEAM_NOT_FOUND_HELP("team.api.teamNotFound.help"),
     
 	// Unknown
     UNKNOWN_ERROR_DESCRIPTION("unexpected.error.description"),
     
     // User API
     USER_API_ERROR_FIND_BY_ID_HELP("user.api.error.findById.help"),
+    USER_API_USER_NOT_FOUND_HELP("user.api.userNotFound.help"),
 
 	// Validation failure
     VALIDATION_FAILURE_DESCRIPTION("validation.failure.description"),
