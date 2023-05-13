@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -18,8 +19,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.priceline.role.RoleApplication;
+import com.priceline.role.dto.RoleDTO;
 import com.priceline.role.enums.MessageEnum;
 import com.priceline.role.model.Role;
 import com.priceline.role.model.exception.PricelineApiException;
@@ -142,6 +145,107 @@ public class RoleServiceTest {
 		assertEquals(exception.getMessage(), message);
 	}
 	
+	// TODO save
+	
+	// TODO update
+	
+	// TODO update default role
+
+	@Test
+	@DisplayName("Delete role")
+	@Transactional
+    public void testDeleteRole() {
+		Role expected = roleRepository.save(createRole(true));
+		Role actual = roleService.findByUid(expected.getUid());
+		
+		assertEquals(expected, actual);
+		assertEquals(1, roleRepository.count());
+
+		// delete role
+		roleService.delete(expected.getUid());
+		
+		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
+			roleService.findByUid(expected.getUid());
+	    });
+		
+		// assert
+		String message = messageService.getMessage(MessageEnum.EXCEPTION_ENTITY_NOT_FOUND_ERR, expected.getUid());
+		assertEquals(exception.getMessage(), message);
+		assertEquals(0, roleRepository.count());
+	}
+	
+	@Test
+	@DisplayName("Validate dto without name")
+	public void testValidateDTOWithoutName() {
+		RoleDTO dto = createRoleDTO(false);
+		dto.setName(null);
+		
+		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
+			roleService.validate(dto);
+	    });
+		
+		// assert
+		String message = messageService.getMessage(MessageEnum.VALIDATION_FAILURE_REQUIRED_ERR, "name");
+		assertEquals(exception.getMessage(), message);
+	}
+	
+	@Test
+	@DisplayName("Validate dto with name that exceeds character limit")
+	public void testValidateDTOWithNameThatExceedsCharacterLimit() {
+		RoleDTO dto = createRoleDTO(false);
+		dto.setName(RandomStringUtils.randomAlphabetic(151));
+		
+		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
+			roleService.validate(dto);
+	    });
+		
+		// assert
+		String message = messageService.getMessage(MessageEnum.VALIDATION_FAILURE_STRING_MAX_LENGTH_ERR, "name", 150);
+		assertEquals(exception.getMessage(), message);
+	}
+	
+	@Test
+	@DisplayName("Validate dto with name that already exists while creating role")
+	public void testValidateDTOWithNameThatAlreadyExistWhileCreatingRole() {
+		// create role
+		Role role = roleRepository.save(createRole(true));
+		
+		RoleDTO dto = createRoleDTO(false);
+		dto.setUid(null); // uid is null during creation
+		dto.setName(role.getName());
+		
+		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
+			roleService.validate(dto);
+	    });
+		
+		// assert
+		String message = messageService.getMessage(MessageEnum.VALIDATION_FAILURE_UNIQUENESS_ERR);
+		assertEquals(exception.getMessage(), message);
+	}
+	
+	@Test
+	@DisplayName("Validate dto with name that already exists while updating role")
+	public void testValidateDTOWithNameThatAlreadyExistWhileUpdatingRole() {
+		// create role
+		Role role1 = roleRepository.save(createRole(true));
+		Role role2 = roleRepository.save(createRole(false));
+		
+		assertEquals(role1, roleService.findByUid(role1.getUid()));
+		assertEquals(role2, roleService.findByUid(role2.getUid()));
+		
+		RoleDTO dto = createRoleDTO(false);
+		dto.setUid(role2.getUid());
+		dto.setName(role1.getName());
+		
+		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
+			roleService.validate(dto);
+	    });
+		
+		// assert
+		String message = messageService.getMessage(MessageEnum.VALIDATION_FAILURE_UNIQUENESS_ERR);
+		assertEquals(exception.getMessage(), message);
+	}
+	
 	// Utilities
 	private Role createRole(boolean defaultRole) {
     	Role role = new Role();
@@ -152,4 +256,11 @@ public class RoleServiceTest {
     	return role;
     }
 
+	private RoleDTO createRoleDTO(boolean defaultRole) {
+		RoleDTO dto = new RoleDTO();
+		dto.setName("Role " + random.nextInt() + System.currentTimeMillis());
+		dto.setDefaultRole(defaultRole);
+		
+		return dto;
+	}
 }
