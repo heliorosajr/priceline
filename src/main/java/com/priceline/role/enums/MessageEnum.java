@@ -9,6 +9,11 @@ public enum MessageEnum {
     EXCEPTION_ENTITY_NOT_FOUND_ERR("exception.entityNotFound.err"),
     EXCEPTION_ENTITY_NOT_FOUND_HELP("exception.entityNotFound.help"),
     
+    // Custom exception = Default role not found
+    EXCEPTION_DEFAULT_ROLE_NOT_FOUND_DESCRIPTION("exception.defaultRoleNotFound.description"),
+    EXCEPTION_DEFAULT_ROLE_NOT_FOUND_ERR("exception.defaultRoleNotFound.err"),
+    EXCEPTION_DEFAULT_ROLE_NOT_FOUND_HELP("exception.defaultRoleNotFound.help"),
+    
     // Membership
     MEMBERSHIP_ERROR_FIND_ALL_HELP("membership.error.findAll.help"),
     MEMBERSHIP_ERROR_FIND_BY_ID_HELP("membership.error.findById.help"),

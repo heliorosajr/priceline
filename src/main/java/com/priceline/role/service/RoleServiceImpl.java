@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.priceline.role.dto.RoleDTO;
 import com.priceline.role.enums.MessageEnum;
 import com.priceline.role.model.Role;
+import com.priceline.role.model.exception.DefaultRoleNotFoundException;
 import com.priceline.role.model.exception.EntityNotFoundException;
 import com.priceline.role.model.exception.PricelineApiException;
 import com.priceline.role.repository.RoleRepository;
@@ -49,7 +50,7 @@ public class RoleServiceImpl implements RoleService {
 
     public Role findDefaultRole() throws PricelineApiException {
         try {
-            return Optional.ofNullable(roleRepository.findByDefaultRoleTrue()).orElseThrow(() -> new EntityNotFoundException("default"));
+            return Optional.ofNullable(roleRepository.findByDefaultRoleTrue()).orElseThrow(() -> new DefaultRoleNotFoundException());
         } catch (Exception exception) {
             throw exceptionService.throwRuntimeException(exception, MessageEnum.ROLE_ERROR_FIND_DEFAULT_HELP);
         }

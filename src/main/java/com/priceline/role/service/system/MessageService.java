@@ -16,7 +16,7 @@ public class MessageService {
     private MessageSource messageSource;
 
     public String getMessage(MessageEnum messageEnum) throws PricelineApiException {
-        return getMessage(messageEnum, null);
+        return getMessage(messageEnum, new Object[] {});
     }
 
     public String getMessage(MessageEnum messageEnum, Object... args) throws PricelineApiException {
