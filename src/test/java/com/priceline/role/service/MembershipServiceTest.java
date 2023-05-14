@@ -408,6 +408,34 @@ public class MembershipServiceTest {
 		assertEquals(exception.getMessage(), message);
 	}
 	
-	// TODO duplicate
+	@Test
+	@DisplayName("Validate dto with membership that already exists")
+	public void testValidateDTOWithMembershipThatAlreadyExists() {
+		// create DTO
+		MembershipDTO dto = TestUtils.createMembershipDTO();
+		
+		// create user DTO
+		UserDTO userDTO = new UserDTO();
+		userDTO.setId(dto.getUserId());
+		
+		// create team DTO
+		TeamDTO teamDTO = new TeamDTO();
+		teamDTO.setId(dto.getTeamId());
+				
+		// configure mock
+		when(pricelineFacade.findUserById(any())).thenReturn(userDTO);
+		when(pricelineFacade.findTeamById(any())).thenReturn(teamDTO);
+		when(roleService.findByUid(anyString())).thenReturn(dto.getRole());
+		when(membershipRepository.findByUserIdAndTeamIdAndRole(anyString(), anyString(), any())).thenReturn(dto.toMembership());
+
+		// validate
+		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
+			membershipService.validate(dto);
+	    });
+		
+		// assert
+		String message = messageService.getMessage(MessageEnum.VALIDATION_FAILURE_UNIQUENESS_ERR);
+		assertEquals(exception.getMessage(), message);
+	}
 
 }
