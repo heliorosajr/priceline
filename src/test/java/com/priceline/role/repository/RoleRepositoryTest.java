@@ -49,6 +49,7 @@ public class RoleRepositoryTest {
     	Role role1 = roleRepository.save(createRole());
     	Role role2 = roleRepository.save(createRole());
     	
+    	// fetch role1
     	Role actual = roleRepository.findByName(role1.getName());
     	
     	// assert
@@ -56,6 +57,7 @@ public class RoleRepositoryTest {
     	assertEquals(role1, actual);
     	assertNotEquals(role2, actual);
     	
+    	// fetch role2 and assert
     	actual = roleRepository.findByName(role2.getName());
     	assertNotNull(actual);
     	assertEquals(role2, actual);
@@ -69,14 +71,18 @@ public class RoleRepositoryTest {
     	Role role1 = roleRepository.save(createRole());
     	Role role2 = roleRepository.save(createRole());
     	
+    	// fetch role1
     	Role actual = roleRepository.findByUid(role1.getUid());
     	
-    	// assert
+    	// assert role1
     	assertNotNull(actual);
     	assertEquals(role1, actual);
     	assertNotEquals(role2, actual);
     	
+    	// fetch role2
     	actual = roleRepository.findByUid(role2.getUid());
+    	
+    	// assert role2
     	assertNotNull(actual);
     	assertEquals(role2, actual);
     	assertNotEquals(role1, actual);
@@ -102,7 +108,7 @@ public class RoleRepositoryTest {
     	// persist values
     	roleRepository.saveAll(roles);
     	
-    	
+    	// fetch default role
     	Role defaultRole = roleRepository.findByDefaultRoleTrue();
     	
     	// assert
@@ -120,6 +126,8 @@ public class RoleRepositoryTest {
     public void testDeletetRoleByUid() {
     	// create role
     	Role role = roleRepository.save(createRole());
+    	
+    	// fetch role
     	Role actual = roleRepository.findByUid(role.getUid());
     	
     	// assert exists

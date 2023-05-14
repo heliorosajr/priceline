@@ -58,18 +58,22 @@ public class MembershipRepositoryTest {
     @Test
     @DisplayName("Get membership by uid")
     public void testGetMembershipByUid() {
-    	// create roles
+    	// create memberships
     	Membership membership1 = membershipRepository.save(createMembership());
     	Membership membership2 = membershipRepository.save(createMembership());
     	
+    	// fetch membership1
     	Membership actual = membershipRepository.findByUid(membership1.getUid());
     	
-    	// assert
+    	// assert membership1
     	assertNotNull(actual);
     	assertEquals(membership1, actual);
     	assertNotEquals(membership2, actual);
     	
+    	// fetch membership2
     	actual = membershipRepository.findByUid(membership2.getUid());
+    	
+    	// assert membership2
     	assertNotNull(actual);
     	assertEquals(membership2, actual);
     	assertNotEquals(membership1, actual);
@@ -78,12 +82,12 @@ public class MembershipRepositoryTest {
     @Test
     @DisplayName("Get membership by role")
     public void testGetMembershipByRole() {
-    	// create roles
+    	// create memberships with default role
     	Membership membership1RoleDefault = membershipRepository.save(createMembership());
     	Membership membership2RoleDefault = membershipRepository.save(createMembership());
     	Membership membership3RoleDefault = membershipRepository.save(createMembership());
     	
-    	// create other role
+    	// create role2
     	Role role2 = createRole(false);
     	
     	// create memberships for role2
@@ -93,9 +97,10 @@ public class MembershipRepositoryTest {
     	Membership membership4Role2 = membershipRepository.save(createMembership(role2));
     	Membership membership5Role2 = membershipRepository.save(createMembership(role2));
     	
+    	// fetch memberships for role default
     	List<Membership> actual = membershipRepository.findByRole_uid(defaultRole.getUid());
     	
-    	// assert
+    	// assert memberships for role default
     	assertEquals(3, actual.size());
     	assertTrue(actual.contains(membership1RoleDefault));
     	assertTrue(actual.contains(membership2RoleDefault));
@@ -107,7 +112,10 @@ public class MembershipRepositoryTest {
     	assertFalse(actual.contains(membership4Role2));
     	assertFalse(actual.contains(membership5Role2));
     	
+    	// fetch memberships for role2
     	actual = membershipRepository.findByRole_uid(role2.getUid());
+    	
+    	// assert
     	assertEquals(5, actual.size());
     	assertTrue(actual.contains(membership1Role2));
     	assertTrue(actual.contains(membership2Role2));
@@ -123,8 +131,10 @@ public class MembershipRepositoryTest {
     @Test
     @DisplayName("Delete membership by uid")
     public void testDeletetMembershipByUid() {
-    	// create role
+    	// create membership
     	Membership membership = membershipRepository.save(createMembership());
+    	
+    	// fetch membership
     	Membership actual = membershipRepository.findByUid(membership.getUid());
     	
     	// assert exists
