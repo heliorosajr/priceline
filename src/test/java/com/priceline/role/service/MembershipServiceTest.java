@@ -51,7 +51,6 @@ public class MembershipServiceTest {
     
     @Mock
     private RoleService roleService;
-
     
     private ValidationService validationService;
 
@@ -144,9 +143,43 @@ public class MembershipServiceTest {
 		assertEquals(actual, expected);
 	}
 	
-	// TODO findRoleOfMembership(String membershipUid)
+	@Test
+	@DisplayName("Get role of membership")
+    public void testGetRoleOfMembership() {
+		// create memberships
+		Membership membership = TestUtils.createMembership();
+		
+		// configure mock
+		when(membershipRepository.findByUid(any())).thenReturn(membership);
 
-	// TODO findMembershipsOfRole(String roleUid)
+		// find role of membership
+		Role actual = membershipService.findRoleOfMembership(membership.getUid());
+		
+		// assert
+		assertEquals(actual, membership.getRole());
+	}
+
+	@Test
+	@DisplayName("Get all memberships of role")
+    public void testGetAllMembershipsOfRole() {
+		// create memberships
+		Membership membership1 = TestUtils.createMembership();
+		Membership membership2 = TestUtils.createMembership(membership1.getRole());
+		Membership membership3 = TestUtils.createMembership(membership1.getRole());
+		Membership membership4 = TestUtils.createMembership(membership1.getRole());
+		Membership membership5 = TestUtils.createMembership(membership1.getRole());
+		List<Membership> expected = List.of(membership1, membership2, membership3, membership4, membership5);
+		
+		// configure mock
+		when(membershipRepository.findByRole_uid(any())).thenReturn(expected);
+
+		// find all memberships
+		List<Membership> actual = membershipService.findMembershipsOfRole(membership1.getRole().getUid());
+		
+		// assert
+		assertEquals(5, actual.size());
+		assertEquals(actual, expected);
+	}
 
 	@Test
 	@DisplayName("Save membership")
