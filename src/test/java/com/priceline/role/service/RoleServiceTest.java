@@ -168,7 +168,70 @@ public class RoleServiceTest {
 		assertEquals(exception.getMessage(), message);
 	}
 	
-	// TODO save
+	@Test
+	@DisplayName("Save first role in database")
+    public void testSaveFirstRoleInDatabase() {
+		// create DTO 
+		RoleDTO dto = createRoleDTO(false);
+		
+		// create role
+		Role expected = dto.toRole();
+		expected.setDefaultRole(true);
+
+		// configure mock
+		when(roleRepository.count()).thenReturn(0L);
+		when(roleRepository.save(any())).thenReturn(expected);
+		
+		// save role
+		Role actual = roleService.save(dto);
+				
+		// assert
+		assertEquals(expected,  actual);
+	}
+	
+	@Test
+	@DisplayName("Save role in database")
+    public void testSaveRoleInDatabase() {
+		// create DTO 
+		RoleDTO dto = createRoleDTO(false);
+		
+		// create role
+		Role expected = dto.toRole();
+
+		// configure mock
+		when(roleRepository.count()).thenReturn(1L);
+		when(roleRepository.save(any())).thenReturn(expected);
+		
+		// save role
+		Role actual = roleService.save(dto);
+				
+		// assert
+		assertEquals(expected,  actual);
+	}
+	
+	@Test
+	@DisplayName("Save role setting role as default")
+    public void testSaveRoleSettingRoleAsDefault() {
+		// create DTO 
+		RoleDTO dto = createRoleDTO(true);
+		
+		// create role
+		Role expected = dto.toRole();
+		
+		// create previous default role
+		Role oldDefaultRole = createRole(true);
+
+		// configure mock
+		when(roleRepository.count()).thenReturn(1L);
+		when(roleRepository.findByDefaultRoleTrue()).thenReturn(oldDefaultRole);
+		when(roleRepository.save(any())).thenReturn(oldDefaultRole).thenReturn(expected);
+				
+		// save role
+		Role actual = roleService.save(dto);
+				
+		// assert
+		assertEquals(expected,  actual);
+	}
 
 	@Test
 	@DisplayName("Update role")
