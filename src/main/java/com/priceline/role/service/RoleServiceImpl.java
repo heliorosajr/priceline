@@ -145,7 +145,6 @@ public class RoleServiceImpl implements RoleService {
     	// ensure name is unique
     	Role role = roleRepository.findByName(dto.getName());
     	validationService.validateUniqueness(dto.getUid(), role);
-
     }
 
 }

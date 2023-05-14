@@ -2,74 +2,108 @@ package com.priceline.role.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.priceline.role.RoleApplication;
+import com.priceline.role.config.MessageConfig;
 import com.priceline.role.dto.RoleDTO;
 import com.priceline.role.enums.MessageEnum;
 import com.priceline.role.model.Role;
+import com.priceline.role.model.exception.DefaultRoleNotFoundException;
+import com.priceline.role.model.exception.EntityNotFoundException;
 import com.priceline.role.model.exception.PricelineApiException;
 import com.priceline.role.repository.RoleRepository;
+import com.priceline.role.service.system.ExceptionService;
 import com.priceline.role.service.system.MessageService;
+import com.priceline.role.service.system.ValidationService;
 
-@RunWith(SpringRunner.class)
-@TestPropertySource("classpath:application.properties")
-@SpringBootTest(classes = RoleApplication.class, properties = {"spring.config.name=roleDb","store.trx.datasource.url=jdbc:h2:mem:roleDb"})
-@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+import jakarta.persistence.PersistenceException;
+
+@ExtendWith(MockitoExtension.class)
 public class RoleServiceTest {
 
-	@Autowired
-	private MessageService messageService;
-
-	@Autowired
+	@Mock
 	private RoleRepository roleRepository;
 	
-	@Autowired
 	private RoleService roleService;
-	
-    private static Random random = new Random();
-    
-    @BeforeAll
-    public static void init() {
-    	random = new Random();
-    }
 
-    @AfterEach
-    public void destroyAll(){
-    	roleRepository.deleteAll();
-    }
+	private Random random = new Random();
+
+	// Dependencies
+	private ExceptionService exceptionService;
 	
+	private MessageService messageService;
+
+	private ValidationService validationService;	
+    
+    @BeforeEach
+    public void setUp() {
+    	messageService = new MessageService(new MessageConfig().messageSource());
+    	exceptionService = new ExceptionService(messageService);
+    	validationService = new ValidationService(exceptionService);
+    	roleService = new RoleServiceImpl(roleRepository, exceptionService, validationService);
+    }
+    
 	@Test
 	@DisplayName("Get role by uid")
     public void testGetRoleByUid() {
-		Role role = roleRepository.save(createRole(true));
-		Role actual = roleService.findByUid(role.getUid());
+		// create role
+		Role expected = createRole(true);
 		
-		assertEquals(role, actual);
+		// configure mock
+		when(roleRepository.findByUid(anyString())).thenReturn(expected);
+		
+		// find by uid
+		Role actual = roleService.findByUid(expected.getUid());
+		
+		// assert
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	@DisplayName("Get role by uid with unexpected exception")
+	@Transactional
+    public void testGetRoleByUidWithUnexpectedException() {
+		// create random id
+		String uid = UUID.randomUUID().toString();
+		
+		// configure mock
+		doThrow(new PersistenceException()).when(roleRepository).findByUid(uid);
+		
+		// delete role
+		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
+			roleService.findByUid(uid);
+	    });
+		
+		// assert
+		String message = messageService.getMessage(MessageEnum.ROLE_ERROR_FIND_BY_ID_HELP, uid);
+		assertEquals(exception.getHelp(), message);
 	}
 	
 	@Test
 	@DisplayName("Get role by nonexistent uid")
     public void testGetRoleByNonexistentUid() {
+		// create random uid
 		String uid = UUID.randomUUID().toString();
+		
+		// configure mock
+		when(roleRepository.findByUid(anyString())).thenThrow(new EntityNotFoundException(uid));
 
+		// find by uid
 		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
 			roleService.findByUid(uid);
 	    });
@@ -82,60 +116,48 @@ public class RoleServiceTest {
 	@Test
 	@DisplayName("Get all roles")
     public void testGetAllRoles() {
-		Role role1 = roleRepository.save(createRole(true));
-		Role role2 = roleRepository.save(createRole(false));
-		Role role3 = roleRepository.save(createRole(false));
-		Role role4 = roleRepository.save(createRole(false));
-		Role role5 = roleRepository.save(createRole(false));
+		// create roles
+		Role role1 = createRole(true);
+		Role role2 = createRole(false);
+		Role role3 = createRole(false);
+		Role role4 = createRole(false);
+		Role role5 = createRole(false);
+		List<Role> expected = List.of(role1, role2, role3, role4, role5);
+		
+		// configure mock
+		when(roleRepository.findAll()).thenReturn(expected);
 
+		// find all roles
 		List<Role> actual = roleService.findAll();
 		
 		// assert
 		assertEquals(5, actual.size());
-		assertEquals(actual, List.of(role1, role2, role3, role4, role5));
+		assertEquals(actual, expected);
 	}
 	
 	@Test
 	@DisplayName("Get default role")
     public void testGetDefaultRole() {
-		Role expected = roleRepository.save(createRole(true));
-		roleRepository.save(createRole(false));
-		roleRepository.save(createRole(false));
-		roleRepository.save(createRole(false));
-		roleRepository.save(createRole(false));
+		// create role
+		Role expected = createRole(true);
+		
+		// configure mock
+		when(roleRepository.findByDefaultRoleTrue()).thenReturn(expected);
 
-		List<Role> allRoles = roleService.findAll();
+		// find default role
 		Role actual = roleService.findDefaultRole();
-		
-		int total = 0;
-		for(Role role : allRoles) {
-			total += role.isDefaultRole() ? 1 : 0;
-		}
-		
+
 		// assert
-		assertEquals(1, total);
 		assertEquals(expected, actual);
 	}
 	
 	@Test
 	@DisplayName("Get default role when a default is not set")
     public void testGetDefaultRoleWhenADefaultIsNotSet() {
-		roleRepository.save(createRole(false));
-		roleRepository.save(createRole(false));
-		roleRepository.save(createRole(false));
-		roleRepository.save(createRole(false));
-		roleRepository.save(createRole(false));
-		
-		List<Role> allRoles = roleService.findAll();
-		
-		int total = 0;
-		for(Role role : allRoles) {
-			total += role.isDefaultRole() ? 1 : 0;
-		}
-		
-		// assert
-		assertEquals(0, total);
+		// configure mock
+		when(roleRepository.findByDefaultRoleTrue()).thenThrow(new DefaultRoleNotFoundException());
 
+		// find default role
 		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
 			roleService.findDefaultRole();
 	    });
@@ -148,22 +170,77 @@ public class RoleServiceTest {
 	// TODO save
 	
 	// TODO update
+
+	@Test
+	@DisplayName("Update default role")
+    public void testUpdateDefaultRole() {
+		// create role
+		Role role1 = createRole(true);
+		
+		// configure mock
+		when(roleRepository.findByDefaultRoleTrue()).thenReturn(role1);
+				
+		// get default role
+		Role defaultRole = roleService.findDefaultRole();
+		
+		// assert
+		assertEquals(role1, defaultRole);
+
+		// create role2
+		Role role2 = createRole(false);
+		
+		// configure mock
+		when(roleRepository.findByUid(role2.getUid())).thenReturn(role2);
+		
+		// update default role to role3
+		defaultRole = roleService.updateDefaultRole(role2.getUid());
+		
+		// assert
+		assertEquals(role2, defaultRole);
+	}
 	
-	// TODO update default role
+	@Test
+	@DisplayName("Update default role using the current default")
+    public void testUpdateDefaultRoleUsginTheCurrentDefault() {
+		// create role
+		Role role = createRole(true);
+
+		// configure mock
+		when(roleRepository.findByDefaultRoleTrue()).thenReturn(role);
+				
+		// get default role
+		Role defaultRole = roleService.findDefaultRole();
+
+		// assert
+		assertEquals(role, defaultRole);
+		
+		// update default role to role3
+		defaultRole = roleService.updateDefaultRole(role.getUid());
+		
+		// assert
+		assertEquals(role, defaultRole);
+	}
 
 	@Test
 	@DisplayName("Delete role")
 	@Transactional
     public void testDeleteRole() {
-		Role expected = roleRepository.save(createRole(true));
+		// create role
+		Role expected = createRole(true);
+		
+		// configure mock
+		when(roleRepository.findByUid(expected.getUid())).thenReturn(expected).thenThrow(new EntityNotFoundException(expected.getUid()));
+		
+		// fetch role
 		Role actual = roleService.findByUid(expected.getUid());
 		
+		// assert
 		assertEquals(expected, actual);
-		assertEquals(1, roleRepository.count());
 
 		// delete role
 		roleService.delete(expected.getUid());
 		
+		// fetch role again
 		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
 			roleService.findByUid(expected.getUid());
 	    });
@@ -175,11 +252,33 @@ public class RoleServiceTest {
 	}
 	
 	@Test
+	@DisplayName("Delete role with unexpected exception")
+	@Transactional
+    public void testDeleteRoleWithUnexpectedException() {
+		// create random id
+		String uid = UUID.randomUUID().toString();
+		
+		// configure mock
+		doThrow(new PersistenceException()).when(roleRepository).deleteByUid(uid);
+		
+		// delete role
+		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
+			roleService.delete(uid);
+	    });
+		
+		// assert
+		String message = messageService.getMessage(MessageEnum.ROLE_ERROR_DELETE_HELP, uid);
+		assertEquals(exception.getHelp(), message);
+	}
+	
+	@Test
 	@DisplayName("Validate dto without name")
 	public void testValidateDTOWithoutName() {
+		// create DTO
 		RoleDTO dto = createRoleDTO(false);
 		dto.setName(null);
 		
+		// validate
 		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
 			roleService.validate(dto);
 	    });
@@ -192,9 +291,11 @@ public class RoleServiceTest {
 	@Test
 	@DisplayName("Validate dto with name that exceeds character limit")
 	public void testValidateDTOWithNameThatExceedsCharacterLimit() {
+		// create DTO
 		RoleDTO dto = createRoleDTO(false);
 		dto.setName(RandomStringUtils.randomAlphabetic(151));
 		
+		// validate
 		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
 			roleService.validate(dto);
 	    });
@@ -208,12 +309,17 @@ public class RoleServiceTest {
 	@DisplayName("Validate dto with name that already exists while creating role")
 	public void testValidateDTOWithNameThatAlreadyExistWhileCreatingRole() {
 		// create role
-		Role role = roleRepository.save(createRole(true));
+		Role role = createRole(true);
 		
+		// create DTO with repeated name
 		RoleDTO dto = createRoleDTO(false);
 		dto.setUid(null); // uid is null during creation
 		dto.setName(role.getName());
 		
+		// configure mock
+		when(roleRepository.findByName(role.getName())).thenReturn(role);
+		
+		// validate
 		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
 			roleService.validate(dto);
 	    });
@@ -226,17 +332,19 @@ public class RoleServiceTest {
 	@Test
 	@DisplayName("Validate dto with name that already exists while updating role")
 	public void testValidateDTOWithNameThatAlreadyExistWhileUpdatingRole() {
-		// create role
-		Role role1 = roleRepository.save(createRole(true));
-		Role role2 = roleRepository.save(createRole(false));
+		// create roles
+		Role role1 = createRole(true);
+		Role role2 = createRole(false);
 		
-		assertEquals(role1, roleService.findByUid(role1.getUid()));
-		assertEquals(role2, roleService.findByUid(role2.getUid()));
-		
+		// create DTO setting name of role1 in role2
 		RoleDTO dto = createRoleDTO(false);
 		dto.setUid(role2.getUid());
 		dto.setName(role1.getName());
+
+		// configure mock
+		when(roleRepository.findByName(role1.getName())).thenReturn(role1);
 		
+		// validate
 		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
 			roleService.validate(dto);
 	    });
