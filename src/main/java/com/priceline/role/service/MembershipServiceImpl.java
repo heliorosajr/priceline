@@ -137,6 +137,12 @@ public class MembershipServiceImpl extends MembershipService {
     	}
     	
     	dto.setRole(role);
+    	
+    	// ensure membership is unique
+    	Membership membership = membershipRepository.findByUserIdAndTeamIdAndRole(dto.getUserId(), dto.getTeamId(), dto.getRole());
+    	if(membership != null) {
+    		exceptionService.throwIllegalArgumentException(MessageEnum.VALIDATION_FAILURE_UNIQUENESS_ERR);
+    	}
     }
 
 }

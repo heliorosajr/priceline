@@ -71,6 +71,33 @@ public class MembershipRepositoryTest {
     }
     
     @Test
+    @DisplayName("Get membership by user id, team id and role")
+    public void testGetMembershipByUserIdAndTeamIdAndRole() {
+    	// create membership
+    	Membership membership1 = membershipRepository.save(TestUtils.createMembership(defaultRole));
+    	Membership membership2 = membershipRepository.save(TestUtils.createMembership(defaultRole));
+    	Membership membership3 = membershipRepository.save(TestUtils.createMembership(defaultRole));
+    	
+    	// fetch membership1
+    	Membership actual = membershipRepository.findByUserIdAndTeamIdAndRole(membership1.getUserId(), membership1.getTeamId(), defaultRole);
+    	
+    	// assert membership1
+    	assertEquals(membership1, actual);
+    	
+    	// fetch membership2
+    	actual = membershipRepository.findByUserIdAndTeamIdAndRole(membership2.getUserId(), membership2.getTeamId(), defaultRole);
+    	
+    	// assert membership2
+    	assertEquals(membership2, actual);
+    	
+    	// fetch membership3
+    	actual = membershipRepository.findByUserIdAndTeamIdAndRole(membership3.getUserId(), membership3.getTeamId(), defaultRole);
+    	
+    	// assert membership3
+    	assertEquals(membership3, actual);
+    }
+    
+    @Test
     @DisplayName("Get membership by role")
     public void testGetMembershipByRole() {
     	// create memberships with default role
