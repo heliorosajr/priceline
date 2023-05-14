@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.priceline.role.config.MessageConfig;
@@ -26,6 +27,7 @@ import com.priceline.role.dto.UserDTO;
 import com.priceline.role.enums.MessageEnum;
 import com.priceline.role.facade.PricelineFacade;
 import com.priceline.role.model.Membership;
+import com.priceline.role.model.Role;
 import com.priceline.role.model.exception.EntityNotFoundException;
 import com.priceline.role.model.exception.PricelineApiException;
 import com.priceline.role.repository.MembershipRepository;
@@ -159,7 +161,7 @@ public class MembershipServiceTest {
 		UserDTO userDTO = new UserDTO();
 		userDTO.setId(dto.getUserId());
 		
-		// create user DTO
+		// create team DTO
 		TeamDTO teamDTO = new TeamDTO();
 		teamDTO.setId(dto.getTeamId());
 
@@ -167,6 +169,41 @@ public class MembershipServiceTest {
 		when(membershipRepository.save(any())).thenReturn(expected);
 		when(pricelineFacade.findUserById(any())).thenReturn(userDTO);
 		when(pricelineFacade.findTeamById(any())).thenReturn(teamDTO);
+		
+		// save membership
+		Membership actual = membershipService.save(dto);
+				
+		// assert
+		assertEquals(expected,  actual);
+	}
+	
+	@Test
+	@DisplayName("Save membership with default role")
+    public void testSaveMembershipWithDefaultRole() {
+		// create default role
+		Role role = TestUtils.createRole(true);
+		
+		// create DTO 
+		MembershipDTO dto = TestUtils.createMembershipDTO();
+		dto.setRole(null);
+		
+		// create membership
+		Membership expected = dto.toMembership();
+		expected.setRole(role);
+		
+		// create user DTO
+		UserDTO userDTO = new UserDTO();
+		userDTO.setId(dto.getUserId());
+		
+		// create team DTO
+		TeamDTO teamDTO = new TeamDTO();
+		teamDTO.setId(dto.getTeamId());
+
+		// configure mock
+		when(membershipRepository.save(any())).thenReturn(expected);
+		when(pricelineFacade.findUserById(any())).thenReturn(userDTO);
+		when(pricelineFacade.findTeamById(any())).thenReturn(teamDTO);
+		when(roleService.findDefaultRole()).thenReturn(role);
 		
 		// save membership
 		Membership actual = membershipService.save(dto);
@@ -335,9 +372,41 @@ public class MembershipServiceTest {
 		assertEquals(exception.getMessage(), message);
 	}
 	
-	// TODO role default
-	
-	// TODO invalid role
+	@Test
+	@DisplayName("Validate dto with nonexistent role")
+	public void testValidateDTOWithNonexistentRole() {
+		// create DTO
+		MembershipDTO dto = TestUtils.createMembershipDTO();
+		dto.getRole().setUid(UUID.randomUUID().toString());
+		
+		// create user DTO
+		UserDTO userDTO = new UserDTO();
+		userDTO.setId(dto.getUserId());
+		
+		// create team DTO
+		TeamDTO teamDTO = new TeamDTO();
+		teamDTO.setId(dto.getTeamId());
+		
+		// create exception
+		String description = messageService.getMessage(MessageEnum.EXCEPTION_ENTITY_NOT_FOUND_DESCRIPTION, new Object[] {});
+		String errorMessage = messageService.getMessage(MessageEnum.EXCEPTION_ENTITY_NOT_FOUND_ERR, dto.getRole().getUid());
+		String help = messageService.getMessage(MessageEnum.EXCEPTION_ENTITY_NOT_FOUND_HELP, new Object[] {});
+		PricelineApiException expectedException = new PricelineApiException(description, errorMessage, help, HttpStatus.NOT_FOUND);
+				
+		// configure mock
+		when(pricelineFacade.findUserById(any())).thenReturn(userDTO);
+		when(pricelineFacade.findTeamById(any())).thenReturn(teamDTO);
+		when(roleService.findByUid(anyString())).thenThrow(expectedException);
+
+		// validate
+		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
+			membershipService.validate(dto);
+	    });
+		
+		// assert
+		String message = messageService.getMessage(MessageEnum.EXCEPTION_ENTITY_NOT_FOUND_ERR, dto.getRole().getUid());
+		assertEquals(exception.getMessage(), message);
+	}
 	
 	// TODO duplicate
 
