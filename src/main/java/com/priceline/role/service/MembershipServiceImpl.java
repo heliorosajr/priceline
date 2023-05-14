@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.priceline.role.dto.MembershipDTO;
@@ -23,20 +22,24 @@ import com.priceline.role.service.system.ValidationService;
 @Service
 public class MembershipServiceImpl extends MembershipService {
 	
-	@Autowired
-    private MembershipRepository membershipRepository;
+    private final MembershipRepository membershipRepository;
 	
-    @Autowired
-    private ExceptionService exceptionService;
+    private final ExceptionService exceptionService;
     
-    @Autowired
-    private PricelineFacade pricelineFacade;
+    private final PricelineFacade pricelineFacade;
     
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
     
-    @Autowired
-    private ValidationService validationService;
+    private final ValidationService validationService;
+    
+    public MembershipServiceImpl(MembershipRepository membershipRepository, ExceptionService exceptionService,
+    		PricelineFacade pricelineFacade, RoleService roleService, ValidationService validationService) {
+    	this.membershipRepository = membershipRepository;
+    	this.exceptionService = exceptionService;
+    	this.pricelineFacade = pricelineFacade;
+    	this.roleService = roleService;
+    	this.validationService = validationService;
+    }
 
     // ----------------------------------------------------
     // Read

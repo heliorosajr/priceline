@@ -1,6 +1,5 @@
 package com.priceline.role.facade;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,8 +15,11 @@ public class PricelineFacade {
 
 	private RestTemplate restTemplate = new RestTemplate();
 	
-	@Autowired
-	private ExceptionService exceptionService;
+	private final ExceptionService exceptionService;
+	
+	public PricelineFacade(ExceptionService exceptionService) {
+		this.exceptionService = exceptionService;
+	}
 	
 	@Value("${base.url.userApi}")
 	private String baseUrlUserApi;

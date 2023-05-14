@@ -1,6 +1,5 @@
 package com.priceline.role.service.system;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.priceline.role.enums.MessageEnum;
@@ -9,8 +8,11 @@ import com.priceline.role.model.base.BaseEntity;
 @Service
 public class ValidationService {
 	
-	@Autowired
-    private ExceptionService exceptionService;
+    private final ExceptionService exceptionService;
+    
+    public ValidationService(ExceptionService exceptionService) {
+    	this.exceptionService = exceptionService;
+    }
 	
 	public void validateStringMaxLength(String str, String field, int max) {
 		if(str != null && str.length() > max) {

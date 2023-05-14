@@ -1,6 +1,5 @@
 package com.priceline.role.service.system;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ExceptionService {
 
-    @Autowired
-    private MessageService messageService;
+    private final MessageService messageService;
+    
+    public ExceptionService(MessageService messageService) {
+    	this.messageService = messageService;
+    }
     
     public PricelineApiException throwIllegalArgumentException(MessageEnum messageEnum, Object... args) throws PricelineApiException {
     	return throwRuntimeException(new IllegalArgumentException(), messageEnum, args);

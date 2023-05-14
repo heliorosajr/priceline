@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.priceline.role.dto.RoleDTO;
@@ -20,14 +19,18 @@ import com.priceline.role.service.system.ValidationService;
 @Service
 public class RoleServiceImpl implements RoleService {
 	
-	@Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 	
-    @Autowired
-    private ExceptionService exceptionService;
+    private final ExceptionService exceptionService;
     
-    @Autowired
-    private ValidationService validationService;
+    private final ValidationService validationService;
+    
+    public RoleServiceImpl(RoleRepository roleRepository, ExceptionService exceptionService,
+    		ValidationService validationService) {
+    	this.roleRepository = roleRepository;
+    	this.exceptionService = exceptionService;
+    	this.validationService = validationService;
+    }
 
     // ----------------------------------------------------
     // Read
