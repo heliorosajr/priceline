@@ -9,11 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import com.priceline.role.model.Role;
+import com.priceline.role.utils.TestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest
@@ -29,13 +27,6 @@ public class RoleRepositoryTest {
 
     @Autowired
     private RoleRepository roleRepository;
-    
-    private static Random random = new Random();
-    
-    @BeforeAll
-    public static void init() {
-    	random = new Random();
-    }
     
     @AfterEach
     public void destroyAll(){
@@ -46,8 +37,8 @@ public class RoleRepositoryTest {
     @DisplayName("Get role by name")
     public void testGetRoleByName() {
     	// create roles
-    	Role role1 = roleRepository.save(createRole());
-    	Role role2 = roleRepository.save(createRole());
+    	Role role1 = roleRepository.save(TestUtils.createRole());
+    	Role role2 = roleRepository.save(TestUtils.createRole());
     	
     	// fetch role1
     	Role actual = roleRepository.findByName(role1.getName());
@@ -68,8 +59,8 @@ public class RoleRepositoryTest {
     @DisplayName("Get role by uid")
     public void testGetRoleByUid() {
     	// create roles
-    	Role role1 = roleRepository.save(createRole());
-    	Role role2 = roleRepository.save(createRole());
+    	Role role1 = roleRepository.save(TestUtils.createRole());
+    	Role role2 = roleRepository.save(TestUtils.createRole());
     	
     	// fetch role1
     	Role actual = roleRepository.findByUid(role1.getUid());
@@ -92,11 +83,11 @@ public class RoleRepositoryTest {
     @DisplayName("Get default role")
     public void testGetDefaultRole() {
     	// create roles
-    	Role role1 = createRole(false);
-    	Role role2 = createRole(false);
-    	Role role3 = createRole(true);
-    	Role role4 = createRole(false);
-    	Role role5 = createRole(false);
+    	Role role1 = TestUtils.createRole(false);
+    	Role role2 = TestUtils.createRole(false);
+    	Role role3 = TestUtils.createRole(true);
+    	Role role4 = TestUtils.createRole(false);
+    	Role role5 = TestUtils.createRole(false);
     	
     	List<Role> roles = new ArrayList<>();
     	roles.add(role1);
@@ -125,7 +116,7 @@ public class RoleRepositoryTest {
     @DisplayName("Delete role by uid")
     public void testDeletetRoleByUid() {
     	// create role
-    	Role role = roleRepository.save(createRole());
+    	Role role = roleRepository.save(TestUtils.createRole());
     	
     	// fetch role
     	Role actual = roleRepository.findByUid(role.getUid());
@@ -140,20 +131,6 @@ public class RoleRepositoryTest {
     	// assert no longer exists
     	actual = roleRepository.findByUid(role.getUid());
     	assertNull(actual);
-    }
-    
-    // Utilities
-    private Role createRole() {
-    	return createRole(true);
-    }
-    
-    private Role createRole(boolean defaultRole) {
-    	Role role = new Role();
-    	role.setUid(UUID.randomUUID().toString());
-    	role.setName("Role " + random.nextInt() + System.currentTimeMillis());
-    	role.setDefaultRole(defaultRole);
-
-    	return role;
     }
 
 }
