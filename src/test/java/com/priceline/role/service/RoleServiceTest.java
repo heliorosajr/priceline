@@ -8,7 +8,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -31,6 +30,7 @@ import com.priceline.role.repository.RoleRepository;
 import com.priceline.role.service.system.ExceptionService;
 import com.priceline.role.service.system.MessageService;
 import com.priceline.role.service.system.ValidationService;
+import com.priceline.role.utils.TestUtils;
 
 import jakarta.persistence.PersistenceException;
 
@@ -41,8 +41,6 @@ public class RoleServiceTest {
 	private RoleRepository roleRepository;
 	
 	private RoleService roleService;
-
-	private Random random = new Random();
 
 	// Dependencies
 	private ExceptionService exceptionService;
@@ -63,7 +61,7 @@ public class RoleServiceTest {
 	@DisplayName("Get role by uid")
     public void testGetRoleByUid() {
 		// create role
-		Role expected = createRole(true);
+		Role expected = TestUtils.createRole(true);
 		
 		// configure mock
 		when(roleRepository.findByUid(anyString())).thenReturn(expected);
@@ -77,7 +75,6 @@ public class RoleServiceTest {
 	
 	@Test
 	@DisplayName("Get role by uid with unexpected exception")
-	@Transactional
     public void testGetRoleByUidWithUnexpectedException() {
 		// create random id
 		String uid = UUID.randomUUID().toString();
@@ -118,11 +115,11 @@ public class RoleServiceTest {
 	@DisplayName("Get all roles")
     public void testGetAllRoles() {
 		// create roles
-		Role role1 = createRole(true);
-		Role role2 = createRole(false);
-		Role role3 = createRole(false);
-		Role role4 = createRole(false);
-		Role role5 = createRole(false);
+		Role role1 = TestUtils.createRole(true);
+		Role role2 = TestUtils.createRole(false);
+		Role role3 = TestUtils.createRole(false);
+		Role role4 = TestUtils.createRole(false);
+		Role role5 = TestUtils.createRole(false);
 		List<Role> expected = List.of(role1, role2, role3, role4, role5);
 		
 		// configure mock
@@ -140,7 +137,7 @@ public class RoleServiceTest {
 	@DisplayName("Get default role")
     public void testGetDefaultRole() {
 		// create role
-		Role expected = createRole(true);
+		Role expected = TestUtils.createRole(true);
 		
 		// configure mock
 		when(roleRepository.findByDefaultRoleTrue()).thenReturn(expected);
@@ -169,10 +166,10 @@ public class RoleServiceTest {
 	}
 	
 	@Test
-	@DisplayName("Save first role in database")
-    public void testSaveFirstRoleInDatabase() {
+	@DisplayName("Save first role")
+    public void testSaveFirstRole() {
 		// create DTO 
-		RoleDTO dto = createRoleDTO(false);
+		RoleDTO dto = TestUtils.createRoleDTO(false);
 		
 		// create role
 		Role expected = dto.toRole();
@@ -190,10 +187,10 @@ public class RoleServiceTest {
 	}
 	
 	@Test
-	@DisplayName("Save role in database")
-    public void testSaveRoleInDatabase() {
+	@DisplayName("Save role")
+    public void testSaveRole() {
 		// create DTO 
-		RoleDTO dto = createRoleDTO(false);
+		RoleDTO dto = TestUtils.createRoleDTO(false);
 		
 		// create role
 		Role expected = dto.toRole();
@@ -213,13 +210,13 @@ public class RoleServiceTest {
 	@DisplayName("Save role setting role as default")
     public void testSaveRoleSettingRoleAsDefault() {
 		// create DTO 
-		RoleDTO dto = createRoleDTO(true);
+		RoleDTO dto = TestUtils.createRoleDTO(true);
 		
 		// create role
 		Role expected = dto.toRole();
 		
 		// create previous default role
-		Role oldDefaultRole = createRole(true);
+		Role oldDefaultRole = TestUtils.createRole(true);
 
 		// configure mock
 		when(roleRepository.count()).thenReturn(1L);
@@ -237,7 +234,7 @@ public class RoleServiceTest {
 	@DisplayName("Update role")
     public void testUpdateRole() {
 		// create role
-		Role role = createRole(true);
+		Role role = TestUtils.createRole(true);
 		
 		// configure mock
 		when(roleRepository.findByUid(role.getUid())).thenReturn(role);
@@ -250,7 +247,7 @@ public class RoleServiceTest {
 		
 		// create DTO
 		String newName = RandomStringUtils.randomAlphabetic(10); 
-		RoleDTO dto = createRoleDTO(false);
+		RoleDTO dto = TestUtils.createRoleDTO(false);
 		dto.setName(newName);
 		
 		// configure mock
@@ -275,7 +272,7 @@ public class RoleServiceTest {
 		
 		// create DTO
 		String newName = RandomStringUtils.randomAlphabetic(10); 
-		RoleDTO dto = createRoleDTO(false);
+		RoleDTO dto = TestUtils.createRoleDTO(false);
 		dto.setName(newName);
 
 		// update
@@ -292,7 +289,7 @@ public class RoleServiceTest {
 	@DisplayName("Update default role")
     public void testUpdateDefaultRole() {
 		// create role
-		Role role1 = createRole(true);
+		Role role1 = TestUtils.createRole(true);
 		
 		// configure mock
 		when(roleRepository.findByDefaultRoleTrue()).thenReturn(role1);
@@ -304,7 +301,7 @@ public class RoleServiceTest {
 		assertEquals(role1, defaultRole);
 
 		// create role2
-		Role role2 = createRole(false);
+		Role role2 = TestUtils.createRole(false);
 		
 		// configure mock
 		when(roleRepository.findByUid(role2.getUid())).thenReturn(role2);
@@ -320,7 +317,7 @@ public class RoleServiceTest {
 	@DisplayName("Update default role using the current default")
     public void testUpdateDefaultRoleUsginTheCurrentDefault() {
 		// create role
-		Role role = createRole(true);
+		Role role = TestUtils.createRole(true);
 
 		// configure mock
 		when(roleRepository.findByDefaultRoleTrue()).thenReturn(role);
@@ -343,7 +340,7 @@ public class RoleServiceTest {
 	@Transactional
     public void testDeleteRole() {
 		// create role
-		Role expected = createRole(true);
+		Role expected = TestUtils.createRole(true);
 		
 		// configure mock
 		when(roleRepository.findByUid(expected.getUid())).thenReturn(expected).thenThrow(new EntityNotFoundException(expected.getUid()));
@@ -365,7 +362,6 @@ public class RoleServiceTest {
 		// assert
 		String message = messageService.getMessage(MessageEnum.EXCEPTION_ENTITY_NOT_FOUND_ERR, expected.getUid());
 		assertEquals(exception.getMessage(), message);
-		assertEquals(0, roleRepository.count());
 	}
 	
 	@Test
@@ -392,7 +388,7 @@ public class RoleServiceTest {
 	@DisplayName("Validate dto without name")
 	public void testValidateDTOWithoutName() {
 		// create DTO
-		RoleDTO dto = createRoleDTO(false);
+		RoleDTO dto = TestUtils.createRoleDTO(false);
 		dto.setName(null);
 		
 		// validate
@@ -409,7 +405,7 @@ public class RoleServiceTest {
 	@DisplayName("Validate dto with name that exceeds character limit")
 	public void testValidateDTOWithNameThatExceedsCharacterLimit() {
 		// create DTO
-		RoleDTO dto = createRoleDTO(false);
+		RoleDTO dto = TestUtils.createRoleDTO(false);
 		dto.setName(RandomStringUtils.randomAlphabetic(151));
 		
 		// validate
@@ -426,10 +422,10 @@ public class RoleServiceTest {
 	@DisplayName("Validate dto with name that already exists while creating role")
 	public void testValidateDTOWithNameThatAlreadyExistWhileCreatingRole() {
 		// create role
-		Role role = createRole(true);
+		Role role = TestUtils.createRole(true);
 		
 		// create DTO with repeated name
-		RoleDTO dto = createRoleDTO(false);
+		RoleDTO dto = TestUtils.createRoleDTO(false);
 		dto.setUid(null); // uid is null during creation
 		dto.setName(role.getName());
 		
@@ -450,11 +446,11 @@ public class RoleServiceTest {
 	@DisplayName("Validate dto with name that already exists while updating role")
 	public void testValidateDTOWithNameThatAlreadyExistWhileUpdatingRole() {
 		// create roles
-		Role role1 = createRole(true);
-		Role role2 = createRole(false);
+		Role role1 = TestUtils.createRole(true);
+		Role role2 = TestUtils.createRole(false);
 		
 		// create DTO setting name of role1 in role2
-		RoleDTO dto = createRoleDTO(false);
+		RoleDTO dto = TestUtils.createRoleDTO(false);
 		dto.setUid(role2.getUid());
 		dto.setName(role1.getName());
 
@@ -471,21 +467,4 @@ public class RoleServiceTest {
 		assertEquals(exception.getMessage(), message);
 	}
 	
-	// Utilities
-	private Role createRole(boolean defaultRole) {
-    	Role role = new Role();
-    	role.setUid(UUID.randomUUID().toString());
-    	role.setName("Role " + random.nextInt() + System.currentTimeMillis());
-    	role.setDefaultRole(defaultRole);
-
-    	return role;
-    }
-
-	private RoleDTO createRoleDTO(boolean defaultRole) {
-		RoleDTO dto = new RoleDTO();
-		dto.setName("Role " + random.nextInt() + System.currentTimeMillis());
-		dto.setDefaultRole(defaultRole);
-		
-		return dto;
-	}
 }
