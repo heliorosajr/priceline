@@ -2,6 +2,7 @@ package com.priceline.role.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -168,8 +169,61 @@ public class RoleServiceTest {
 	}
 	
 	// TODO save
+
+	@Test
+	@DisplayName("Update role")
+    public void testUpdateRole() {
+		// create role
+		Role role = createRole(true);
+		
+		// configure mock
+		when(roleRepository.findByUid(role.getUid())).thenReturn(role);
+		
+		// fetch role
+		Role expected = roleService.findByUid(role.getUid());
+		
+		// assert
+		assertEquals(role, expected);
+		
+		// create DTO
+		String newName = RandomStringUtils.randomAlphabetic(10); 
+		RoleDTO dto = createRoleDTO(false);
+		dto.setName(newName);
+		
+		// configure mock
+		expected.setName(newName);
+		when(roleRepository.save(any())).thenReturn(expected);
+				
+		// update role
+		expected = roleService.update(dto, role.getUid());
+		
+		// assert
+		assertEquals(newName, expected.getName());
+	}
 	
-	// TODO update
+	@Test
+	@DisplayName("Update nonexistent role")
+    public void testUpdateNonexistentRole() {
+		// create random uid
+		String uid = UUID.randomUUID().toString();
+		
+		// configure mock
+		when(roleRepository.findByUid(anyString())).thenThrow(new EntityNotFoundException(uid));
+		
+		// create DTO
+		String newName = RandomStringUtils.randomAlphabetic(10); 
+		RoleDTO dto = createRoleDTO(false);
+		dto.setName(newName);
+
+		// update
+		PricelineApiException exception = assertThrows(PricelineApiException.class, () -> {
+			roleService.update(dto, uid);
+	    });
+		
+		// assert
+		String message = messageService.getMessage(MessageEnum.EXCEPTION_ENTITY_NOT_FOUND_ERR, uid);
+		assertEquals(exception.getMessage(), message);
+	}
 
 	@Test
 	@DisplayName("Update default role")
