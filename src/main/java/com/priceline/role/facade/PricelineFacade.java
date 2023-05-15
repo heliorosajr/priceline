@@ -13,12 +13,13 @@ import com.priceline.role.service.system.ExceptionService;
 @Service
 public class PricelineFacade {
 
-	private RestTemplate restTemplate = new RestTemplate();
+	private final RestTemplate restTemplate;
 	
 	private final ExceptionService exceptionService;
 	
-	public PricelineFacade(ExceptionService exceptionService) {
+	public PricelineFacade(ExceptionService exceptionService, RestTemplate restTemplate) {
 		this.exceptionService = exceptionService;
+		this.restTemplate = restTemplate;
 	}
 	
 	@Value("${base.url.userApi}")
