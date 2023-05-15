@@ -35,6 +35,7 @@ import com.priceline.role.controller.restfull.assembler.RoleModelAssembler;
 import com.priceline.role.dto.MembershipDTO;
 import com.priceline.role.enums.MessageEnum;
 import com.priceline.role.model.Membership;
+import com.priceline.role.model.Role;
 import com.priceline.role.model.error.PricelineApiError;
 import com.priceline.role.model.exception.PricelineApiException;
 import com.priceline.role.service.MembershipService;
@@ -141,6 +142,57 @@ public class MembershipControllerTest {
 		// send request
 		MvcResult result = mockMvc.perform(
 					MockMvcRequestBuilders.get(BASE_API + "/all")
+					.contentType(MediaType.APPLICATION_JSON))
+//				.andDo(MockMvcResultHandlers.print()) // debug purposes only
+                .andReturn();
+		 
+		// convert JSON to list
+		List<Membership> actual = TestUtils.convertResponseToObjectList(result.getResponse().getContentAsString(), Membership.class);
+
+	    // assert
+		assertEquals(actual, expected);
+	}
+
+	@Test
+	@DisplayName("Get role of membership")
+    public void testGetRoleOfMembership() throws Exception {
+		// create membership
+		Membership expected = TestUtils.createMembership();
+		
+		// configure mock
+		when(membershipService.findRoleOfMembership(expected.getRole().getUid())).thenReturn(expected.getRole());
+
+		// send request
+		MvcResult result = mockMvc.perform(
+					MockMvcRequestBuilders.get(BASE_API + "/role-of-membership/" + expected.getRole().getUid())
+					.contentType(MediaType.APPLICATION_JSON))
+//				.andDo(MockMvcResultHandlers.print()) // debug purposes only
+                .andReturn();
+		 
+		// convert JSON to list
+		Role actual = TestUtils.convertToObject(result.getResponse().getContentAsString(), Role.class);
+
+	    // assert
+		assertEquals(actual, expected.getRole());
+	}
+
+	@Test
+	@DisplayName("Get all memberships of role")
+    public void testGetAllMembershipsOfRole() throws Exception {
+		// create memberships
+		Membership membership1 = TestUtils.createMembership();
+		Membership membership2 = TestUtils.createMembership(membership1.getRole());
+		Membership membership3 = TestUtils.createMembership(membership1.getRole());
+		Membership membership4 = TestUtils.createMembership(membership1.getRole());
+		Membership membership5 = TestUtils.createMembership(membership1.getRole());
+		List<Membership> expected = List.of(membership1, membership2, membership3, membership4, membership5);
+		
+		// configure mock
+		when(membershipService.findMembershipsOfRole(membership1.getRole().getUid())).thenReturn(expected);
+
+		// send request
+		MvcResult result = mockMvc.perform(
+					MockMvcRequestBuilders.get(BASE_API + "/by-role/" + membership1.getRole().getUid())
 					.contentType(MediaType.APPLICATION_JSON))
 //				.andDo(MockMvcResultHandlers.print()) // debug purposes only
                 .andReturn();
