@@ -1,0 +1,32 @@
+version: '3.3'
+services:
+  role_api:
+    container_name: role_api
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      - DATABASE_USER=user
+      - DATABASE_PASSWORD=mysqladmin
+      - DATABASE_URL=jdbc:mysql://db:3306/priceline?useUnicode=yes&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
+      - DATABASE_PORT=3306
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'priceline'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'mysqladmin'
+      MYSQL_ROOT_PASSWORD: 'mysqladmin'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - api-db:/var/lib/mysql
+
+volumes:
+  api-db:
