@@ -14,8 +14,9 @@ A role is defined as a function that an user will perform inside a team, while a
  * [How to run](#how-to-run)
  * [Database](#database)
  * [Swagger](#swagger)
+ * [Known Issues](#known-issues)
  * [Enhancements](#enhancements)
- * [Suggestion](#suggestions)
+ * [Suggestions](#suggestions)
  * [Contact](#contact)
 
 ## Purpose
@@ -62,7 +63,26 @@ Results are available at ``<path>/priceline/target/site/jacoco/index.html``
 
 
 ## How to run?
-// TODO
+If you want to run the code in your IDE, you can import it as a regular maven project. Do not forget to create a MySQL database named priceline and also to configure the following required environment variables:
+```shell
+export DATABASE_USER=<your_user>
+export DATABASE_PASSWORD=<your_password>
+export DATABASE_URL=jdbc:mysql://<DB_HOST>:<DB_PORT>/priceline?useUnicode=yes&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
+```
+
+However, if you would like to use the API, you can use a docker for testing. 
+
+First, build the jar file with:
+```shell
+mvn clean install -DskipTests
+```
+
+Then use the following command:
+```shell
+docker-compose up
+```
+After a few moments, you should be able to access the database and to make requests to the API.
+
 
 ## Database
 All API data is stored in a MySQL database and the application is configured with flyway to handle database migrations. Migration files can be found at ``src/main/java/resources/db/migration``.
@@ -70,13 +90,15 @@ All API data is stored in a MySQL database and the application is configured wit
 ## Swagger
 All endpoints are documented and you can find details accessing API Swagger, available [here](http://localhost:8080/swagger-ui/index.html#/)
 
+## Known Issues
+For some reason, after changing property file to use environment variable, repository tests started to fail. I'm investigating this problem.
+
 ## Enhancements
 - Increase code coverage (currently it is close to 60%)
 - Jenkins integration to stablish CI/CD
 - Improve property files management with ansible scripts to easily deploy to test and production environments
 - Migrate current synchronous request to asynchronous using queue mechanisms
 - Implement Spring Security to protect endpoints
-- Configure docker-compose
 
 ## Suggestions
 - Implement Spring Security to protect endpoints
