@@ -1,13 +1,30 @@
 package com.priceline.role.utils;
 
+import java.lang.reflect.Type;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.priceline.role.dto.MembershipDTO;
 import com.priceline.role.dto.RoleDTO;
 import com.priceline.role.model.Membership;
 import com.priceline.role.model.Role;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class TestUtils {
 	
 	private static Random random = new Random();
@@ -61,5 +78,65 @@ public class TestUtils {
 		
 		return dto;
 	}
+	
+	// Json utils
+	public static <T> T convertToObject(String value, Type type) {
+        try {
+            return localDateTimeGson.fromJson(value, type);
+        } catch (Exception e) {
+        	log.error("convertToObject(String, Type). String: " + value);
+            log.error("Error: " + e.getMessage());
+            throw e;
+        }
+    }
+
+	public static String asJsonString(final Object object) {
+		if(object == null) {
+            return "{}";
+        }
+
+        try {
+            return localDateTimeGson.toJson(object);
+        } catch (Exception e) {
+            log.error("parseObjectToString(Object). Object: " + object);
+            log.error("Error: " + e.getMessage());
+            throw e;
+        }
+    }
+	
+	public static JsonObject parseToJson(String value) {
+        if(value == null) {
+            return null;
+        }
+
+        try {
+            return JsonParser.parseString(value).getAsJsonObject();
+        } catch (Exception e) {
+            log.error("parseToJson(String). String: " + value);
+            log.error("Error: " + e.getMessage());
+            throw e;
+        }
+    }
+	
+	public static <T> List<T> convertResponseToObjectList(String response, Class<T> aClass) {
+        JsonObject json = parseToJson(response);
+        JsonArray content = json.getAsJsonArray("content");
+        Object [] array = (Object[]) java.lang.reflect.Array.newInstance(aClass, 0);
+        array = localDateTimeGson.fromJson(content, array.getClass());
+        List<T> list = new ArrayList<>();
+        for (Object o : array) {
+            list.add(aClass.cast(o));
+        }
+
+        return list;
+    }
+	
+	private static final Gson localDateTimeGson = new GsonBuilder()
+        .registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
+            @Override
+            public LocalDateTime deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+                return LocalDateTime.parse(json.getAsString(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+            }
+        }).create();
 
 }
