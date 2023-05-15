@@ -56,7 +56,7 @@ public class RoleController {
 
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);
     }
-
+  
     @Operation(summary = "List all roles")
     @ApiResponse(responseCode = "200", description = "Role list retrieved", content = {
         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Role.class)))})
@@ -67,7 +67,18 @@ public class RoleController {
 
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
     }
-    
+
+    @Operation(summary = "Get default role")
+    @ApiResponse(responseCode = "200", description = "Role was found",
+            content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation =  Role.class)) })
+    @ApiErrorResponses
+    @GetMapping("/default")
+    public ResponseEntity<?> findDefaultRole() throws PricelineApiException {
+        EntityModel<Role> entityModel = assembler.toModel(roleService.findDefaultRole());
+
+        return ResponseEntity.status(HttpStatus.OK).body(entityModel);
+    }
+
     @PostMapping
     @Operation(summary = "Add role")
     @ApiResponse(responseCode = "201", description = "Created", content = {
