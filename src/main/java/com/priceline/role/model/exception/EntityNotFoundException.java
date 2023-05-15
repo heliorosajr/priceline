@@ -4,14 +4,9 @@ import org.springframework.http.HttpStatus;
 
 import com.priceline.role.enums.MessageEnum;
 
-import lombok.Getter;
-
 public class EntityNotFoundException extends BaseException {
 
     private static final long serialVersionUID = 1L;
-
-	@Getter
-    private final Object id;
 
     public EntityNotFoundException(Object id) {
         super(
@@ -19,7 +14,6 @@ public class EntityNotFoundException extends BaseException {
                 MessageEnum.EXCEPTION_ENTITY_NOT_FOUND_ERR, new Object[] { id }, // error message
                 MessageEnum.EXCEPTION_ENTITY_NOT_FOUND_HELP, null, // help
                 HttpStatus.NOT_FOUND);
-        this.id = id;
     }
 
 }
