@@ -1,6 +1,7 @@
 ### Maven ###
 target/
 logs
+.m2/
 
 ### IntelliJ IDEA ###
 .idea
