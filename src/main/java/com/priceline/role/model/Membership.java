@@ -15,10 +15,10 @@ import lombok.EqualsAndHashCode;
 @Entity(name = DatabaseConstants.TABLE_MEMBERSHIP)
 public class Membership extends BaseEntity {
 
-    @Column(length = 40, nullable = false)
+    @Column(name = "user_id", length = 40, nullable = false)
     private String userId;
     
-    @Column(length = 40, nullable = false)
+    @Column(name = "team_id", length = 40, nullable = false)
     private String teamId;
     
     @ManyToOne
