@@ -76,4 +76,4 @@ All endpoints are documented and you can find details accessing API Swagger, ava
 
 ## Contact
 If you have any questions about the implementation, suggestions or critics, please let me know. I'll be glad to answer.
-- [Hélio De Rosa Junior](mailto:helio_junior@apple.com) (11) 9 97195-5771
+- [Hélio De Rosa Junior](mailto:helio_junior@gmail.com) (11) 9 97195-5771
