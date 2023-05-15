@@ -17,9 +17,12 @@ public class PricelineFacade {
 	
 	private final ExceptionService exceptionService;
 	
-	public PricelineFacade(ExceptionService exceptionService, RestTemplate restTemplate) {
+	public PricelineFacade(ExceptionService exceptionService, RestTemplate restTemplate,
+			@Value("${base.url.userApi}") final String baseUrlUserApi, @Value("${base.url.teamApi}") final String baseUrlTeamApi) {
 		this.exceptionService = exceptionService;
 		this.restTemplate = restTemplate;
+		this.baseUrlUserApi = baseUrlUserApi;
+		this.baseUrlTeamApi = baseUrlTeamApi;
 	}
 	
 	@Value("${base.url.userApi}")

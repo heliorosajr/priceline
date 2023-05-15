@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import org.apache.commons.lang3.RandomStringUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -19,6 +21,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.priceline.role.dto.MembershipDTO;
 import com.priceline.role.dto.RoleDTO;
+import com.priceline.role.dto.TeamDTO;
+import com.priceline.role.dto.UserDTO;
 import com.priceline.role.model.Membership;
 import com.priceline.role.model.Role;
 
@@ -76,6 +80,36 @@ public class TestUtils {
 		dto.setTeamId(UUID.randomUUID().toString());
 		dto.setRole(role);
 		
+		return dto;
+	}
+	
+	// UserDTO
+	public static UserDTO createUserDTO() {
+		UserDTO dto = new UserDTO();
+		dto.setId(UUID.randomUUID().toString());
+		dto.setFirstName(RandomStringUtils.randomAlphabetic(20));
+		dto.setLastName(RandomStringUtils.randomAlphabetic(20));
+		dto.setDisplayName(RandomStringUtils.randomAlphabetic(40));
+		dto.setAvatarUrl(RandomStringUtils.randomAlphabetic(20));
+		
+		return dto;
+	}
+	
+	// TeamDTO
+	public static TeamDTO createTeamDTO() {
+		TeamDTO dto = new TeamDTO();
+		dto.setId(UUID.randomUUID().toString());
+		dto.setName(RandomStringUtils.randomAlphabetic(20));
+		dto.setTeamLeadId(UUID.randomUUID().toString());
+		dto.setTeamMemberIds(new ArrayList<>());
+		
+		// add team members
+		dto.getTeamMemberIds().add(UUID.randomUUID().toString());
+		dto.getTeamMemberIds().add(UUID.randomUUID().toString());
+		dto.getTeamMemberIds().add(UUID.randomUUID().toString());
+		dto.getTeamMemberIds().add(UUID.randomUUID().toString());
+		dto.getTeamMemberIds().add(UUID.randomUUID().toString());
+				
 		return dto;
 	}
 	
