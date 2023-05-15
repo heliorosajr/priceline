@@ -10,25 +10,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.priceline.role.model.Role;
 import com.priceline.role.utils.TestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest
+@ActiveProfiles("test-containers")
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 public class RoleRepositoryTest {
 
     @Autowired
     private RoleRepository roleRepository;
     
-    @AfterEach
+    @BeforeEach
     public void destroyAll(){
     	roleRepository.deleteAll();
     }

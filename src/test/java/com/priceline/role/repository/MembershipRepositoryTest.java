@@ -16,7 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.priceline.role.model.Membership;
 import com.priceline.role.model.Role;
@@ -24,6 +27,8 @@ import com.priceline.role.utils.TestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest
+@ActiveProfiles("test-containers")
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 public class MembershipRepositoryTest {
 	
 	@Autowired
