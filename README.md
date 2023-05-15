@@ -49,9 +49,17 @@ Repository classes can be found at ``com.priceline.role.repository`` package. Th
 Currently, the API is small and it has only ``RoleController.java`` and ``MembershipController.java``, both availabe in package ``com.priceline.role.controller``.
 
 ### Tests
-Currently, according to Eclipse, the unit tests are covering almost 60% of the code.
-
 Unit tests are implemented in all layers (repository, service and controller).
+
+Currently, according to JaCoCo, the unit tests are covering 60% of the code.
+
+To run JaCoCo reports again, execute the following command:
+```shell
+$ mvn clean install
+```
+
+Results are available at ``<path>/priceline/target/site/jacoco/index.html``
+
 
 ## How to run?
 // TODO
