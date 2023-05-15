@@ -63,6 +63,8 @@ Results are available at ``<path>/priceline/target/site/jacoco/index.html``
 
 
 ## How to run?
+Code is available at [GitHub](#https://github.com/heliorosajr/priceline).
+
 If you want to run the code in your IDE, you can import it as a regular maven project. Do not forget to create a MySQL database named priceline and also to configure the following required environment variables:
 ```shell
 export DATABASE_USER=<your_user>
