@@ -1,6 +1,5 @@
 package com.priceline.role.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -38,14 +37,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Membership", description = "Endpoints to work with memberships")
 public class MembershipController {
 	
-	@Autowired
-    private MembershipService membershipService;
+    private final MembershipService membershipService;
 
-    @Autowired
-    private MembershipModelAssembler assembler;
+    private final MembershipModelAssembler assembler;
+
+    private final RoleModelAssembler roleAssembler;
     
-    @Autowired
-    private RoleModelAssembler roleAssembler;
+    public MembershipController(MembershipService membershipService,
+    		MembershipModelAssembler assembler, RoleModelAssembler roleAssembler) {
+    	this.membershipService = membershipService;
+    	this.assembler = assembler;
+    	this.roleAssembler = roleAssembler;
+    }
 
     @Operation(summary = "Get membership by id")
     @ApiResponse(responseCode = "200", description = "Membership was found",

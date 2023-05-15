@@ -1,6 +1,5 @@
 package com.priceline.role.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -37,11 +36,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Role", description = "Endpoints to work with roles")
 public class RoleController {
 	
-	@Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
-    @Autowired
-    private RoleModelAssembler assembler;
+    private final RoleModelAssembler assembler;
+    
+    public RoleController(RoleService roleService, RoleModelAssembler assembler) {
+    	this.roleService = roleService;
+    	this.assembler = assembler;
+    }
 
     @Operation(summary = "Get role by id")
     @ApiResponse(responseCode = "200", description = "Role was found",
