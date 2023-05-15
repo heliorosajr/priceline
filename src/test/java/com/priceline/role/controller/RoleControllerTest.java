@@ -2,6 +2,7 @@ package com.priceline.role.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.priceline.role.config.MessageConfig;
@@ -236,6 +238,24 @@ public class RoleControllerTest {
         assertEquals(actual.getErrorMessage(), error.getErrorMessage());
         assertEquals(actual.getReason(), error.getReason());
         assertEquals(actual.getStatus(), error.getStatus());
+	}
+
+	@Test
+	@DisplayName("Delete role")
+    public void testDeleteRole() throws Exception {
+		// create role
+		Role role = TestUtils.createRole();
+		
+		// configure mock
+		doNothing().when(roleService).delete(any());
+	    
+	    // send request
+	    mockMvc.perform(
+			MockMvcRequestBuilders.delete(BASE_API + "/" + role.getUid())
+			.contentType(MediaType.APPLICATION_JSON))
+//			           	.andDo(MockMvcResultHandlers.print()) // debug purposes only
+	    .andExpect(MockMvcResultMatchers.status().is(204));
+	        
 	}
 
 }
